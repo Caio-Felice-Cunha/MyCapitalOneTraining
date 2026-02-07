@@ -1,37 +1,29 @@
-CREATE DATABASE IF NOT EXISTS Scenario01;
--- This is the crucial missing piece:
-GRANT ALL PRIVILEGES ON Scenario01.* TO 'analyst'@'%';
-FLUSH PRIVILEGES;
-
 USE Scenario01;
 
-CREATE TABLE customers (
-    customer_id INT PRIMARY KEY,
-    country VARCHAR(2),
-    province_state VARCHAR(10),
-    signup_date DATE,
-    segment VARCHAR(10)
-);
+###################### SQL QUESTIONS ######################
 
-CREATE TABLE products (
-    product_id INT PRIMARY KEY,
-    product_name VARCHAR(50),
-    category VARCHAR(30),
-    monthly_price DECIMAL(10,2)
-);
+# Fundamentals
 
-CREATE TABLE subscriptions (
-    subscription_id INT PRIMARY KEY,
-    customer_id INT REFERENCES customers(customer_id),
-    product_id INT REFERENCES products(product_id),
-    start_date DATE,
-    end_date DATE,
-    status VARCHAR(20)
-);
+## 1 - List all active subscriptions with customer country and product name.
+SELECT 
+	subscriptions.subscription_id
+    , customers.customer_id
+    , customers.country
+    , products.product_name
+    , subscriptions.start_date
+FROM
+	subscriptions
+    LEFT JOIN
+		customers
+        ON subscriptions.customer_id = customers.customer_id
+        LEFT JOIN 
+			products
+			ON subscriptions.product_id = products.product_id
+WHERE
+	subscriptions.status = 'active'
+ORDER BY
+	subscriptions.subscription_id ASC;
 
-CREATE TABLE payments (
-    payment_id INT PRIMARY KEY,
-    subscription_id INT REFERENCES subscriptions(subscription_id),
-    payment_date DATE,
-    amount DECIMAL(10,2)
-);
+## 2 - Count how many customers per country.
+
+## 3 - Compute total revenue (sum of payments) by product_name.
