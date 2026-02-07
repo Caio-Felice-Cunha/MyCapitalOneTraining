@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_analytics
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: analytics
+      MYSQL_USER: analyst
+      MYSQL_PASSWORD: analyst
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  notebook:
+    build: .
+    container_name: jupyter_analytics
+    depends_on:
+      - mysql
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      DB_HOST: mysql
+      DB_NAME: analytics
+      DB_USER: analyst
+      DB_PASSWORD: analyst
+    command: >
+      jupyter lab
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --allow-root
+
+volumes:
+  mysql_data:
