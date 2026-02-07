@@ -31,15 +31,13 @@ services:
       DB_NAME: analytics
       DB_USER: analyst
       DB_PASSWORD: analyst
-      JUPYTER_PASSWORD: "capitalone"
     command: >
       jupyter lab
       --ip=0.0.0.0
       --port=8888
       --no-browser
       --allow-root
-      --ServerApp.password=${JUPYTER_PASSWORD}
-      --ServerApp.token=''
-
+      --ServerApp.token='capitalone'
+      --ServerApp.password=''
 volumes:
   mysql_data:
