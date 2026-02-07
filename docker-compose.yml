@@ -10,8 +10,6 @@ services:
       MYSQL_DATABASE: analytics
       MYSQL_USER: analyst
       MYSQL_PASSWORD: analyst
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
