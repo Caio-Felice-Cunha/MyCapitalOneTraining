@@ -1,25 +1,5 @@
--- init.sql
-
--- Default DB defined by MYSQL_DATABASE=analytics
-CREATE TABLE IF NOT EXISTS transactions (
-    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT,
-    category VARCHAR(50),
-    amount DECIMAL(10,2),
-    transaction_date DATE
-);
-
-INSERT INTO transactions (customer_id, category, amount, transaction_date)
-VALUES
-(1, 'Food', 120.50, '2023-01-01'),
-(1, 'Travel', 300.00, '2023-01-02'),
-(2, 'Food', 75.20, '2023-01-01'),
-(2, 'Bills', 220.00, '2023-01-03');
-
--- Create second database
 CREATE DATABASE IF NOT EXISTS Scenario01;
-
--- Grant access for your app user
+-- This is the crucial missing piece:
 GRANT ALL PRIVILEGES ON Scenario01.* TO 'analyst'@'%';
 FLUSH PRIVILEGES;
 
@@ -42,8 +22,8 @@ CREATE TABLE products (
 
 CREATE TABLE subscriptions (
     subscription_id INT PRIMARY KEY,
-    customer_id INT,
-    product_id INT,
+    customer_id INT REFERENCES customers(customer_id),
+    product_id INT REFERENCES products(product_id),
     start_date DATE,
     end_date DATE,
     status VARCHAR(20)
@@ -51,7 +31,7 @@ CREATE TABLE subscriptions (
 
 CREATE TABLE payments (
     payment_id INT PRIMARY KEY,
-    subscription_id INT,
+    subscription_id INT REFERENCES subscriptions(subscription_id),
     payment_date DATE,
     amount DECIMAL(10,2)
 );
