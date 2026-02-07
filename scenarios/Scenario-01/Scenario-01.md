@@ -100,7 +100,7 @@ Then import the CSVs **customers.csv, products.csv, subscriptions.csv, payments.
 
 ## 3. Query set – from basic to advanced
 
-Use these as timed drills (e.g., 10–12 minutes for harder ones). Many mirror the kind of questions you’d see in a CodeSignal/Capital One assessment. [linkjob](https://www.linkjob.ai/interview-questions/capital-one-data-analyst-codesignal-questions-preparation/)
+Use these as timed drills (e.g., 10–12 minutes for harder ones). Many mirror the kind of questions you’d see in a CodeSignal/Capital One assessment. 
 
 ### A. Fundamentals
 
