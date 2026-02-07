@@ -92,3 +92,47 @@ Based on the Senior Associate Data Analyst profile, this repo prioritizes:
 ---
 
 > **Note:** This repository is for educational purposes and personal study. All datasets used are synthetic or open-source.
+
+---
+
+# My study plan (One-week prep tailored plan)
+
+## **Day 1 – Platform + format**
+
+- Create the architecture for the project, and start stablishing a more organized way to create database, business questions and related subjects.
+
+## **Day 2–3 – SQL reps (targeted)**
+
+- Use AI to create problems and data for my databases:
+  - 5–8 SQL problems per day focusing on joins + window functions + CTEs similar to the real scenarios. 
+- Solving the problems.
+- My goal: each medium-level business query in **≤10 minutes**.
+
+## **Day 4-5 – Python**
+
+- Use AI to create problems and data for my analytics:
+  - 5–8 Python problems per day focusing on data analytics. 
+- Solving the problems.
+- My goal: each medium-level business query in **≤10 minutes**.
+
+## **Day 6 – CSV data mini‑case**
+
+- Grab any Kaggle dataset (transactions, customers, churn).
+- Timebox 60–70 min:
+  - Load in pandas or a local SQL DB.
+  - Answer 8–10 questions written by AI in “CodeSignal style” (proportions, group comparisons, trends).
+- Force myself to **move on** if stuck >5 min (simulate the real timing).
+
+## **Day 7 – Mixed drill**
+
+- 30–40 minutes:
+  - 3–4 conceptual multiple-choice style questions you invent:
+    - E.g., “If campaign A has 5% conversion on 10,000 users and B has 6% on 2,000 users, which is better and why?”
+- 30–40 minutes:
+  - 2 SQL questions, 1 with a window function, 1 with a tricky date filter.
+
+## **Day 7 – Light review + rest**
+
+- Review my most common mistakes and patterns:
+  - Wrong join types, forgetting GROUP BY columns, off-by-one in window ranking, etc.
+- Sleep well; treat the test day like race day.
