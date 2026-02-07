@@ -1,0 +1,5 @@
+product_id,product_name,category,monthly_price
+101,Basic Analytics,Analytics,49
+102,Pro Analytics,Analytics,129
+103,Supply Chain Opt,Supply Chain,299
+104,Fraud Detector,Risk,399

@@ -1,0 +1,5 @@
+transaction_id;customer_id;category;amount;transaction_date
+1;1;Food;120.50;2023-01-01
+2;1;Travel;300.00;2023-01-02
+3;2;Food;75.20;2023-01-01
+4;2;Bills;220.00;2023-01-03
