@@ -2,6 +2,8 @@
 
 This repository serves as a dedicated environment for mastering the technical competencies required for Capital One's Data Analyst assessment. The goal is to simulate production-grade data workflows using **SQL (MySQL)**, **Python (Pandas/Jupyter)**, **Excel** and **Docker**.
 
+<img width="1024" height="1024" alt="Feb 6, 2026, 07_39_58 PM" src="https://github.com/user-attachments/assets/4455d218-60bf-4d99-a3fa-2f6b6b9abab6" />
+
 ## 🚀 Overview
 
 Capital One’s Senior Associate Data Analyst role demands a blend of rigorous statistical analysis and scalable data engineering. This project mimics that ecosystem by containerizing a MySQL database and providing a sandbox for exploratory data analysis (EDA) and complex query optimization.
