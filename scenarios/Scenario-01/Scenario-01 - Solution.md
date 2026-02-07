@@ -158,12 +158,24 @@ GROUP BY c.country;
 Hint: approximate monthly revenue by summing payments and dividing by count of distinct customers, grouped by segment.
 
 ```sql
-SELECT c.segment,
-       SUM(pay.amount) / COUNT(DISTINCT c.customer_id) AS avg_revenue_per_customer
-FROM payments pay
-JOIN subscriptions s ON pay.subscription_id = s.subscription_id
-JOIN customers c ON s.customer_id = c.customer_id
-GROUP BY c.segment;
+WITH monthly_metrics AS (
+    -- Step 1: Calculate total revenue and unique paying customers per month/segment
+    SELECT 
+        c.segment,
+        DATE_FORMAT(p.payment_date, '%Y-%m-01') AS payment_month,
+        SUM(p.amount) AS total_revenue,
+        COUNT(DISTINCT c.customer_id) AS paying_customers
+    FROM customers c
+    JOIN subscriptions s ON c.customer_id = s.customer_id
+    JOIN payments p ON s.subscription_id = p.subscription_id
+    GROUP BY c.segment, payment_month
+)
+-- Step 2: Average the "Revenue per Customer" across all months
+SELECT 
+    segment,
+    ROUND(AVG(total_revenue / paying_customers), 2) AS avg_monthly_rev_per_customer
+FROM monthly_metrics
+GROUP BY segment;
 ```
 
 6. Identify customers who **upgraded** from **Basic Analytics** to **Pro Analytics** at any time.
