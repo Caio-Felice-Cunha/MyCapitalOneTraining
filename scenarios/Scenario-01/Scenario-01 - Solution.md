@@ -181,14 +181,32 @@ GROUP BY segment;
 6. Identify customers who **upgraded** from **Basic Analytics** to **Pro Analytics** at any time.
 
 ```sql
-SELECT DISTINCT c.customer_id
-FROM customers c
-JOIN subscriptions s1 ON c.customer_id = s1.customer_id
-JOIN products p1 ON s1.product_id = p1.product_id
-JOIN subscriptions s2 ON c.customer_id = s2.customer_id
-JOIN products p2 ON s2.product_id = p2.product_id
-WHERE p1.product_name = 'Basic Analytics'
-  AND p2.product_name = 'Pro Analytics';
+WITH customer_history AS (
+	SELECT
+		subscriptions.customer_id
+        , products.product_name
+        , subscriptions.start_date
+        , MAX( CASE 
+					WHEN 
+						products.product_name = 'Basic Analytics' THEN 1 ELSE 0 END) 
+					OVER(
+						PARTITION BY subscriptions.customer_id
+                        ORDER BY subscriptions.start_date
+                        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS had_basic_previously
+	FROM subscriptions
+    JOIN
+		products
+        ON subscriptions.product_id = products.product_id
+)
+SELECT
+	DISTINCT customer_id
+FROM
+	customer_history
+WHERE
+	product_name = 'Pro Analytics'
+    AND had_basic_previously = 1
+;
 ```
 
 ### C. Time-based & retention style logic
