@@ -151,3 +151,35 @@ GROUP BY
 
 
 ## 6 - Identify customers who upgraded from Basic Analytics to Pro Analytics at any time.
+WITH customer_history AS (
+	SELECT
+		subscriptions.customer_id
+        , products.product_name
+        , subscriptions.start_date
+        , MAX( CASE 
+					WHEN 
+						products.product_name = 'Basic Analytics' THEN 1 ELSE 0 END) 
+					OVER(
+						PARTITION BY subscriptions.customer_id
+                        ORDER BY subscriptions.start_date
+                        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS had_basic_previously
+	FROM subscriptions
+    JOIN
+		products
+        ON subscriptions.product_id = products.product_id
+)
+SELECT
+	DISTINCT customer_id
+FROM
+	customer_history
+WHERE
+	product_name = 'Pro Analytics'
+    AND had_basic_previously = 1
+;
+
+
+
+
+
+
