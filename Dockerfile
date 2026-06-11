@@ -1,9 +1,7 @@
 FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    default-libmysqlclient-dev \
-    && rm -rf /var/lib/apt/lists/*
+# The stack uses PyMySQL (pure Python), so no MySQL C client or compiler is
+# needed. All dependencies in requirements.txt ship manylinux wheels.
 
 WORKDIR /app
 

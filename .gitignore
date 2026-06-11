@@ -1,1 +1,29 @@
+# IDE / tooling
 .guides/
+.vscode/
+.idea/
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local environment overrides (commit .env.example, never .env)
+.env
+
+# Generated analysis outputs (regenerate by running the notebook)
+data/output/

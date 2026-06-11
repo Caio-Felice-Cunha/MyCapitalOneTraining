@@ -1,4 +1,6 @@
-version: "3.9"
+# Local training sandbox only. Synthetic data, no real credentials.
+# Values come from a local .env file (see .env.example); the defaults after
+# ":-" let the stack come up even without one. Do not reuse these anywhere real.
 
 services:
   mysql:
@@ -6,10 +8,10 @@ services:
     container_name: mysql_analytics
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: analytics
-      MYSQL_USER: analyst
-      MYSQL_PASSWORD: analyst
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-analytics}
+      MYSQL_USER: ${MYSQL_USER:-analyst}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-analyst}
     ports:
       - "3307:3306"
     volumes:
@@ -28,16 +30,16 @@ services:
     working_dir: /app
     environment:
       DB_HOST: mysql
-      DB_NAME: analytics
-      DB_USER: analyst
-      DB_PASSWORD: analyst
+      DB_NAME: ${MYSQL_DATABASE:-analytics}
+      DB_USER: ${MYSQL_USER:-analyst}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-analyst}
     command: >
       jupyter lab
       --ip=0.0.0.0
       --port=8888
       --no-browser
       --allow-root
-      --ServerApp.token='capitalone'
+      --ServerApp.token=${JUPYTER_TOKEN:-capitalone}
       --ServerApp.password=''
 volumes:
   mysql_data:
