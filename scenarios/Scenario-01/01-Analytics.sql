@@ -32,7 +32,7 @@ ORDER BY
 ## 2 - Count how many customers per country.
 USE Scenario01;
 SELECT
-	COUNT(customer_id) AS Total_Custumers
+	COUNT(customer_id) AS Total_Customers
     , country
 FROM 
 	customers
@@ -183,26 +183,164 @@ WHERE
 
 ##################################################################
 # Time-based & retention style logic
+# Assume we care about the period 2024-03-01 to 2024-04-30.
 ##################################################################
 
-## 7 - 
-
+## 7 - For each product, compute total revenue in that period.
+SELECT
+	products.product_name AS Product
+    , SUM(payments.amount) AS Revenue_Mar_Apr
+FROM
+	payments
+    JOIN
+		subscriptions
+        ON payments.subscription_id = subscriptions.subscription_id
+        JOIN
+			products
+            ON subscriptions.product_id = products.product_id
+WHERE
+	payments.payment_date BETWEEN '2024-03-01' AND '2024-04-30'
+GROUP BY
+	products.product_name
+ORDER BY
+	Revenue_Mar_Apr DESC
 ;
-## 8 - 
 
+
+## 8 - For each customer, determine their first payment date and latest payment date.
+SELECT
+	customers.customer_id AS Customer
+    , MIN(payments.payment_date) AS First_Payment_Date
+    , MAX(payments.payment_date) AS Last_Payment_Date
+FROM
+	customers
+    JOIN
+		subscriptions
+        ON customers.customer_id = subscriptions.customer_id
+        JOIN
+			payments
+            ON subscriptions.subscription_id = payments.subscription_id
+GROUP BY
+	customers.customer_id
+ORDER BY
+	customers.customer_id ASC
 ;
-## 9 - 
 
+
+## 9 - Find the month-over-month revenue trend (by calendar month) for the whole business.
+SELECT
+	DATE_FORMAT(payments.payment_date, "%Y-%m-01") AS Payment_Month
+    , SUM(payments.amount) AS Monthly_Revenue
+FROM
+	payments
+GROUP BY
+	Payment_Month
+ORDER BY
+	Payment_Month ASC
 ;
 
 ##################################################################
-# Window functions (Capital One‑style)
+# Window functions (Capital One-style)
 ##################################################################
 
-## - 
-
+## 10 - For each country, rank customers by total revenue and return the top 3 per country.
+WITH revenue_per_customer AS (
+	SELECT
+		customers.customer_id
+        , customers.country
+        , SUM(payments.amount) AS Total_Revenue
+	FROM
+		customers
+        JOIN
+			subscriptions
+            ON customers.customer_id = subscriptions.customer_id
+            JOIN
+				payments
+                ON subscriptions.subscription_id = payments.subscription_id
+	GROUP BY
+		customers.customer_id
+        , customers.country
+)
+, ranked AS (
+	SELECT
+		customer_id
+        , country
+        , Total_Revenue
+        , DENSE_RANK() OVER (
+			PARTITION BY country
+            ORDER BY Total_Revenue DESC
+		) AS Revenue_Rank
+	FROM
+		revenue_per_customer
+)
+SELECT
+	country
+    , customer_id
+    , Total_Revenue
+    , Revenue_Rank
+FROM
+	ranked
+WHERE
+	Revenue_Rank <= 3
+ORDER BY
+	country ASC
+    , Revenue_Rank ASC
+    , Total_Revenue DESC
 ;
 
-## - 
 
+## 11 - For each subscription, compute the cumulative revenue over time (ordered by payment_date).
+SELECT
+	subscriptions.subscription_id
+    , payments.payment_date
+    , payments.amount
+    , SUM(payments.amount) OVER (
+		PARTITION BY subscriptions.subscription_id
+        ORDER BY payments.payment_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+	) AS Cumulative_Revenue
+FROM
+	payments
+    JOIN
+		subscriptions
+        ON payments.subscription_id = subscriptions.subscription_id
+ORDER BY
+	subscriptions.subscription_id ASC
+    , payments.payment_date ASC
+;
+
+
+## 12 - For each product, compute the average payment amount and flag each payment above that average.
+WITH with_avg AS (
+	SELECT
+		products.product_name
+        , payments.payment_id
+        , payments.amount
+        , AVG(payments.amount) OVER (
+			PARTITION BY products.product_id
+		) AS Avg_Amount
+	FROM
+		payments
+        JOIN
+			subscriptions
+            ON payments.subscription_id = subscriptions.subscription_id
+            JOIN
+				products
+                ON subscriptions.product_id = products.product_id
+)
+SELECT
+	product_name
+    , payment_id
+    , amount
+    , ROUND(Avg_Amount, 2) AS Avg_Amount
+    , CASE
+		WHEN amount > Avg_Amount THEN 'above_avg'
+        WHEN amount = Avg_Amount THEN 'equal_avg'
+        ELSE 'below_avg'
+	END AS Amount_vs_Avg
+FROM
+	with_avg
+ORDER BY
+	product_name ASC
+    , payment_id ASC
 ;
