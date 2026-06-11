@@ -1,6 +1,12 @@
 # Capital One CodeSignal Prep: Senior Associate, Data Analyst
 
-This repository serves as a dedicated environment for mastering the technical competencies required for Capital One's Data Analyst assessment. The goal is to simulate production-grade data workflows using **SQL (MySQL)**, **Python (Pandas/Jupyter)**, **Excel** and **Docker**.
+A self-study sandbox for the Capital One Data Analyst (CodeSignal) assessment. It ships a small synthetic SaaS dataset (customers, products, subscriptions, payments) in two interchangeable forms, a MySQL seed and matching CSVs, plus a set of timed SQL drills with reference solutions and a pandas EDA notebook.
+
+**What it is:** practice material, not a product. The business problem it models is the kind a SaaS data analyst answers daily: revenue by product and region, churn and retention, and upsell detection.
+
+**Run it in ~2 minutes:** `docker-compose up -d` brings up MySQL (seeded) and JupyterLab. No Docker? `pip install -r requirements.txt` then open `notebooks/01_exploratory_analysis.ipynb`; it reads the CSVs and needs no database. The drills live in `scenarios/Scenario-01/`.
+
+This repository simulates the workflow using **SQL (MySQL)**, **Python (Pandas/Jupyter)**, **Excel** and **Docker**.
 
 <img width="1024" height="1024" alt="Feb 6, 2026, 07_39_58 PM" src="https://github.com/user-attachments/assets/4455d218-60bf-4d99-a3fa-2f6b6b9abab6" />
 
@@ -19,21 +25,30 @@ Capital One’s Senior Associate Data Analyst role demands a blend of rigorous s
 ## 🏗 Project Architecture
 
 ```text
-capitalone-codesignal/
+MyCapitalOneTraining/
 ├── docker/
 │   └── mysql/
-│       └── init.sql           # Database schema and seed data
+│       └── init.sql                       # Schema + seed data (source of truth)
+├── scenarios/
+│   └── Scenario-01/
+│       ├── Scenario-01.md                 # The 12-question drill brief
+│       ├── Scenario-01 - Solution.md      # Reference solutions for all 12
+│       └── 01-Analytics.sql               # Worked solutions (this is the showcase)
 ├── notebooks/
-│   └── 01_exploratory_analysis.ipynb  # EDA and Python-based logic
+│   └── 01_exploratory_analysis.ipynb      # pandas EDA, runs on the CSVs alone
 ├── data/
-│   ├── raw/                   # Input files (e.g., transactions.xlsx)
-│   └── output/                # Processed results
-├── sql/
-│   └── analytics.sql          # Production-ready SQL queries
-├── Dockerfile                 # Python environment config
-├── docker-compose.yml         # Multi-container orchestration
-├── requirements.txt           # Python dependencies
-└── README.md                  # You are here
+│   └── raw/                               # customers/products/subscriptions/payments CSVs
+│       └── transactions.csv               # small extra table (semicolon-delimited)
+├── scripts/
+│   └── export_csvs.py                     # regenerate the CSVs from init.sql
+├── tests/
+│   └── test_data_integrity.py             # pytest data-integrity checks
+├── Dockerfile                             # Python environment for JupyterLab
+├── docker-compose.yml                     # MySQL + JupyterLab orchestration
+├── .env.example                           # local sandbox credentials (copy to .env)
+├── requirements.txt                       # runtime dependencies
+├── requirements-dev.txt                   # test/dev dependencies
+└── README.md                              # You are here
 
 ```
 
@@ -54,30 +69,64 @@ docker-compose up -d
 
 ```
 
+JupyterLab is then available at `http://localhost:8888` (token `capitalone`, configurable in `.env`). The credentials in `docker-compose.yml` and `.env.example` are local-sandbox-only defaults over synthetic data. Do not reuse them anywhere real.
+
 ### 3. Install Python Dependencies
 
-If you are running the notebooks locally (outside of Docker):
+If you are running the notebook locally (outside of Docker):
 
 ```bash
 pip install -r requirements.txt
-
+# for the tests as well:
+pip install -r requirements-dev.txt
 ```
 
 ---
 
 ## 📊 Workflow
 
-### SQL Analysis
+### SQL drills
 
-The `sql/analytics.sql` file contains solutions to high-level business questions
+`scenarios/Scenario-01/01-Analytics.sql` holds worked solutions to all 12 business questions, from fundamentals (joins, group by) through window functions (`DENSE_RANK`, cumulative sums, partitioned averages) and an upgrade-detection query using `ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING`. The brief is in `Scenario-01.md` and reference answers are in `Scenario-01 - Solution.md`.
 
 ### Python Exploratory Data Analysis
 
-The Jupyter Notebooks in `/notebooks` focus on:
+`notebooks/01_exploratory_analysis.ipynb` reads the CSVs in `data/raw/`, checks data quality (orphan foreign keys, null `end_date` only on active subscriptions), aggregates revenue by product and by country, and writes `data/output/results.xlsx`. It runs with pandas alone; an optional final cell runs the same revenue query against MySQL when the DB env vars are present.
 
-* Handling missing values;
-* Visualizing distribution patterns;
-* Validating data types before ingestion into the MySQL instance.
+### Data sources stay in sync
+
+`docker/mysql/init.sql` is the single source of truth. The four CSVs in `data/raw/` are generated from it by `scripts/export_csvs.py`, so the CSV-only workflow and the MySQL workflow return the same answers. `tests/test_data_integrity.py` enforces that. After editing `init.sql`, regenerate with:
+
+```bash
+python scripts/export_csvs.py
+pytest -q
+```
+
+---
+
+## ✅ Results
+
+These come from running the notebook against the committed data (30 customers, 12 products, 60 subscriptions, 90 payments). They are reproducible, not stored estimates: run the notebook or `pytest -q` to regenerate them.
+
+**Top products by total revenue (sum of payments):**
+
+| Product | Total revenue |
+|---|---|
+| Supply Chain Opt | 4,614 |
+| Fraud Detector | 4,389 |
+| Basic Analytics | 1,972 |
+| Pro Analytics | 1,855 |
+| Enterprise Analytics | 1,797 |
+
+**Revenue and paying customers by country:**
+
+| Country | Total revenue | Paying customers |
+|---|---|---|
+| CA | 8,993 | 5 |
+| US | 6,252 | 3 |
+| BR | 3,255 | 2 |
+
+Total payments across the dataset sum to 18,500. Of the 30 customers, 10 have subscriptions and payments (the rest are signups with no purchase yet), which is realistic for a retention/upsell drill.
 
 ---
 
