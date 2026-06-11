@@ -3,3 +3,11 @@ product_id,product_name,category,monthly_price
 102,Pro Analytics,Analytics,129
 103,Supply Chain Opt,Supply Chain,299
 104,Fraud Detector,Risk,399
+105,Enterprise Analytics,Analytics,599.00
+106,Marketing Insights,Analytics,199.00
+107,Logistics Planner,Supply Chain,179.00
+108,Inventory Optimizer,Supply Chain,249.00
+109,Compliance Monitor,Risk,349.00
+110,Credit Scoring,Risk,279.00
+111,Churn Predictor,Analytics,159.00
+112,Revenue Forecaster,Analytics,209.00
